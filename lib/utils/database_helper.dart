@@ -10,16 +10,12 @@ class DatabaseHelper {
   DatabaseHelper._createInstance(); // Named constructor to create instance of DatabaseHelper
 
   factory DatabaseHelper() {
-    if (_databaseHelper == null) {
-      _databaseHelper = DatabaseHelper._createInstance();
-    }
+    _databaseHelper ??= DatabaseHelper._createInstance();
     return _databaseHelper!;
   }
 
   Future<Database?> get database async {
-    if (_database == null) {
-      _database = await initializeDatabase();
-    }
+    _database ??= await initializeDatabase();
     return _database;
   }
 
@@ -30,13 +26,14 @@ class DatabaseHelper {
   String colDate = 'date';
   String colPriority = 'priority';
 
-  initializeDatabase() async {
+  Future<Database?> initializeDatabase() async {
     // Get the directory path for both Android and iOS to store database.
     Directory directory = await getApplicationDocumentsDirectory();
     String _path = directory.path + 'notes.db';
 
     // Open/Create the database at the given path
     var notesDb = await openDatabase(_path, version: 1, onCreate: _createDb);
+    return notesDb;
   }
 
   Future<void> _createDb(Database db, int version) async {
@@ -45,6 +42,16 @@ class DatabaseHelper {
         ' $colTitle TEXT, $colDescription TEXT, $colPriority INTEGER,'
         ' $colDate TEXT)');
   }
+
+  // Fetch Operation: Get all note objects from database
+  Future<List<Map<String, dynamic>>> getNoteMapList() async {
+    Database? db = await database;
+
+//		var result = await db.rawQuery('SELECT * FROM $noteTable order by $colPriority ASC');
+    var result = await db!.query(noteTable, orderBy: '$colPriority ASC');
+    return result;
+  }
+
 
   Future<int> insertNoteUsingRawQuery(Note note) async {
     Database? db = await database;
@@ -85,5 +92,28 @@ class DatabaseHelper {
     var result =
         await db!.rawDelete('DELETE FROM $noteTable WHERE $colId = ${note.id}');
     return result;
+  }
+
+  // Get number of Note objects in database
+  Future<int?> getCount() async {
+    Database? db = await database;
+    List<Map<String, dynamic>> notes = await db!.rawQuery('SELECT COUNT (*) from $noteTable');
+    int? result = Sqflite.firstIntValue(notes);
+    return result;
+  }
+
+  // Get the 'Map List' [ List<Map> ] and convert it to 'Note List' [ List<Note> ]
+  Future<List<Note>> getNoteList() async {
+
+    List<Map<String, dynamic>> noteMapList = await getNoteMapList(); // Get 'Map List' from database
+    int count = noteMapList.length;         // Count the number of map entries in db table
+
+    List<Note> noteList = <Note>[];
+    // For loop to create a 'Note List' from a 'Map List'
+    for (int i = 0; i < count; i++) {
+      noteList.add(Note.fromMapObject(noteMapList[i]));
+    }
+
+    return noteList;
   }
 }
