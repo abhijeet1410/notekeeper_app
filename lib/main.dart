@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:notekeeper_app/pages/currency_page.dart';
 
 import 'pages/note_listing_page.dart';
 
@@ -15,7 +16,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: NoteListingPage(),
+      home: CurrencyPage(),
     );
   }
 }

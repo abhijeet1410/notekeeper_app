@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:notekeeper_app/components/note_tile.dart';
 import 'package:sqflite/sqflite.dart';
-
 import '../models/note.dart';
 import '../utils/database_helper.dart';
 
