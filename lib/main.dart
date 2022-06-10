@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:notekeeper_app/pages/currency_page.dart';
 
 import 'pages/note_listing_page.dart';
@@ -11,7 +12,7 @@ class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return GetMaterialApp(
       title: 'NoteKeeper',
       theme: ThemeData(
         primarySwatch: Colors.blue,
